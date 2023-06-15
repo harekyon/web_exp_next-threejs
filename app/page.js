@@ -7,13 +7,13 @@ import * as Stats from "stats-js";
 import * as dat from "dat.gui";
 
 export default function Home() {
-  let canvas = null;
+  // let canvas = null;
   useEffect(() => {
-    if (canvas) return;
+    // if (canvas) return;
     // canvasを取得
     let stats = initStats();
     let scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xffffff, 0.015, 100);
+    // scene.fog = new THREE.Fog(0xffffff, 0.015, 100);
     scene.overrideMaterial = new THREE.MeshLambertMaterial({
       color: 0xffffff,
     });
@@ -37,7 +37,7 @@ export default function Home() {
 
     document.getElementById("WebGL-output").appendChild(renderer.domElement);
 
-    let planeGeometry = new THREE.PlaneGeometry(60, 40, 1, 1);
+    let planeGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
     let planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
     let plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.receiveShadow = true;
@@ -48,7 +48,11 @@ export default function Home() {
     scene.add(plane);
 
     let ambientLight = new THREE.AmbientLight(0x0c0c0c);
-    scene.add(ambientLight);
+    // scene.add(ambientLight);
+    var spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(-20, 30, -5);
+    spotLight.castShadow = true;
+    scene.add(spotLight);
 
     let controls = new (function () {
       this.rotationSpeed = 0.02;
@@ -84,12 +88,19 @@ export default function Home() {
 
       return stats;
     }
+    window.addEventListener("resize", onResize, false);
+    console.log("aaa");
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
   }, []);
   return (
     <>
       <div id="Stats-output"></div>
       <div id="WebGL-output"></div>
-      <canvas id="canvas"></canvas>
+      {/* <canvas id="canvas"></canvas> */}
     </>
   );
 }
