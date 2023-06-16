@@ -10,20 +10,21 @@ import * as dat from "dat.gui";
 
 // three lib
 import * as THREE from "three";
-import { createMultiMaterialObject } from "../node_modules/three/examples/jsm/utils/SceneUtils.js";
-import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
+import { orbitControler } from "../Modules/orbitControler.js";
+
+// original functions
+import * as Objects from "../Objects/Structure.js";
+import { textToTextureConvert } from "../Modules/tools.js";
+
+// value
 
 export default function Home() {
   useEffect(() => {
-    console.log(OrbitControls);
+    console.log(textToTextureConvert);
     // if (canvas) return;
     // canvasを取得
     let stats = initStats();
     let scene = new THREE.Scene();
-    // scene.fog = new THREE.Fog(0xffffff, 0.015, 100);
-    // scene.overrideMaterial = new THREE.MeshLambertMaterial({
-    //   color: 0xffffff,
-    // });
 
     let camera = new THREE.PerspectiveCamera(
       45,
@@ -44,112 +45,56 @@ export default function Home() {
 
     document.getElementById("WebGL-output").appendChild(renderer.domElement);
 
-    console.log(OrbitControls);
-    let orbitControls = new OrbitControls(camera, renderer.domElement);
-    // orbitControls.autoRotate = true;
-    let clock = new THREE.Clock();
-    let delta = clock.getDelta();
+    let orbitControl = orbitControler(camera, renderer);
 
-    let axes = new THREE.AxesHelper(25);
+    let axes = new THREE.AxesHelper(10);
     scene.add(axes);
-    let materials = [
-      new THREE.MeshLambertMaterial({
-        opacity: 0.6,
-        color: 0x44ff44,
-        transparent: true,
-      }),
-      new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true }),
-    ];
-    let planeGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
+    // let materials = [
+    //   new THREE.MeshLambertMaterial({
+    //     opacity: 0.6,
+    //     color: 0x44ff44,
+    //     transparent: true,
+    //   }),
+    //   new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true }),
+    // ];
 
-    let textureLoader = new THREE.TextureLoader();
-    let floorTex = {
-      texDiff: textureLoader.load(
-        "/laminate_floor_03_2k/textures/laminate_floor_03_diff_2k.jpg",
-        THREE.RepeatWrappin,
-        THREE.RepeatWrappin
-      ),
-      texAo: textureLoader.load(
-        "/laminate_floor_03_2k/textures/laminate_floor_03_ao_2k.jpg"
-      ),
-      texNormal: textureLoader.load(
-        "/laminate_floor_03_2k/textures/laminate_floor_03_nor_dx_2k.jpg"
-      ),
-      texDisp: textureLoader.load(
-        "/laminate_floor_03_2k/textures/laminate_floor_03_disp_2k.jpg"
-      ),
-      texRough: textureLoader.load(
-        "/laminate_floor_03_2k/textures/laminate_floor_03_rough_2k.jpg"
-      ),
-    };
-    console.log(floorTex.texDiff);
-    floorTex.texDiff.wrapS = THREE.RepeatWrapping;
-    floorTex.texDiff.wrapT = THREE.RepeatWrapping;
-    floorTex.texDiff.repeat = new THREE.Vector2(2, 2);
-    floorTex.texDiff.rotation = -0.5 * Math.PI;
-    function autoInitTexture(textureObj) {
-      textureObj.wrapS = THREE.RepeatWrapping;
-      textureObj.wrapT = THREE.RepeatWrapping;
-      textureObj.repeat = new THREE.Vector2(2, 2);
-      textureObj.rotation = -0.5 * Math.PI;
-    }
-    autoInitTexture(floorTex.texDiff);
-    autoInitTexture(floorTex.texAo);
-    autoInitTexture(floorTex.texNormal);
-    autoInitTexture(floorTex.texDisp);
-    autoInitTexture(floorTex.texRough);
+    scene.add(Objects.floor);
+    scene.add(Objects.leftWall);
+    scene.add(Objects.rightWall);
 
-    let wallTex = {
-      texDiff: textureLoader.load(
-        "/leather_white_2k/textures/leather_white_diff_2k.jpg"
-      ),
-      texAo: textureLoader.load(
-        "/leather_white_2k/textures/leather_white_ao_2k.jpg"
-      ),
-      texNormal: textureLoader.load(
-        "/leather_white_2k/textures/leather_white_nor_gl_2k.jpg"
-      ),
-      texRough: textureLoader.load(
-        "/leather_white_2k/textures/leather_white_rough_2k.jpg"
-      ),
-    };
-    let floorMaterials = new THREE.MeshStandardMaterial({
-      map: floorTex.texDiff,
-      normalMap: floorTex.texNormal,
-      normalScale: new THREE.Vector2(1, -1),
-      aoMap: floorTex.texAo,
-      displacementMap: floorTex.texDisp,
-      roughnessMap: floorTex.texRough,
+    let bitmap = document.createElement("canvas");
+    let g = bitmap.getContext("2d");
+    let text = "nyoooonaaaaaaaaaaa";
+    bitmap.width = 200;
+    bitmap.height = 200;
+    g.font = "Bold 10px Arial";
+    g.fillStyle = "white";
+    g.fillText(text, 0, 10);
+    g.strokeStyle = "black";
+    g.strokeText(text, 0, 10);
+
+    let texture = new THREE.Texture(bitmap);
+    texture.needsUpdate = true;
+
+    let planeStatusGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
+    let planeStatusMaterial = new THREE.MeshStandardMaterial({
+      map: texture,
     });
-    let wallMaterials = new THREE.MeshStandardMaterial({
-      map: wallTex.texDiff,
-      normalMap: wallTex.texNormal,
-      normalScale: new THREE.Vector2(1, -1),
-      aoMap: wallTex.texAo,
-      roughnessMap: wallTex.texRough,
-    });
-    let floor = new THREE.Mesh(planeGeometry, floorMaterials);
-    floor.receiveShadow = true;
-    floor.rotation.x = -0.5 * Math.PI;
-    floor.position.x = 0;
-    floor.position.y = 0;
-    floor.position.z = 0;
-    scene.add(floor);
-    let leftWall = new THREE.Mesh(planeGeometry, wallMaterials);
-    leftWall.receiveShadow = true;
-    leftWall.rotation.y = -0.5 * Math.PI;
-    leftWall.position.x = 25;
-    leftWall.position.y = 25;
-    leftWall.position.z = 0;
-    scene.add(leftWall);
-    let rightWall = new THREE.Mesh(planeGeometry, wallMaterials);
-    rightWall.receiveShadow = true;
-    rightWall.rotation.z = 0.5 * Math.PI;
-    rightWall.position.x = 0;
-    rightWall.position.y = 25;
-    rightWall.position.z = -25;
+    let planeStatusMesh = new THREE.Mesh(
+      planeStatusGeometry,
+      planeStatusMaterial
+    );
 
-    scene.add(rightWall);
+    const options = {
+      fontSize: "10px",
+      text: "harepoko",
+    };
+    scene.add(textToTextureConvert(planeStatusGeometry, options));
+
+    planeStatusMesh.position.y = 5;
+    planeStatusMesh.position.x = -10;
+    planeStatusMesh.name = "plane";
+    scene.add(planeStatusMesh);
 
     let ambientLight = new THREE.AmbientLight(0x444444);
     scene.add(ambientLight);
@@ -164,27 +109,31 @@ export default function Home() {
 
     let controls = new (function () {
       this.rotationSpeed = 0.0;
+      this.statusRotateSpeed = 0.0;
     })();
 
     let gui = new dat.GUI();
     gui.add(controls, "rotationSpeed", 0, 0.5);
+    gui.add(controls, "statusRotateSpeed", -0.3, 0.3);
 
     render();
 
     function render() {
       stats.update();
-
+      planeStatusMesh.rotation.y += controls.statusRotateSpeed;
       scene.traverse(function (obj) {
-        if (obj instanceof THREE.Mesh && obj != floor) {
+        if (obj instanceof THREE.Mesh && obj != Objects.floor) {
           obj.rotation.x += controls.rotationSpeed;
           obj.rotation.y += controls.rotationSpeed;
           obj.rotation.z += controls.rotationSpeed;
         }
       });
-      orbitControls.update(delta);
+      orbitControl.instance.update(orbitControler.delta);
       requestAnimationFrame(render);
       renderer.render(scene, camera);
     }
+
+    window.addEventListener("click", onPointerMove);
 
     function initStats() {
       let stats = new Stats();
@@ -203,6 +152,26 @@ export default function Home() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function onPointerMove(e) {
+      const raycaster = new THREE.Raycaster();
+      const vector = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        (e.clientY / window.innerHeight) * -2 + 1
+      );
+      raycaster.setFromCamera(vector, camera);
+
+      const intersects = raycaster.intersectObjects(scene.children);
+      if (intersects.length) {
+        console.log(intersects[0].object.name);
+        if (intersects[0].object.log) {
+          window.clearTimeout(timer);
+          timer = window.setTimeout(() => intersects[0].object.log(""), 100);
+          intersects[0].object.log("click");
+        }
+      }
+      console.log("run");
     }
   }, []);
   return (
