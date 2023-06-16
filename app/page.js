@@ -2,7 +2,7 @@
 
 // basis
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // extension lib
 import * as Stats from "stats-js";
@@ -19,12 +19,15 @@ import { textToTextureConvertReturnMesh } from "../Modules/tools.js";
 // value
 
 export default function Home() {
-  const [select, setSelect] = useState("WELCOME");
+  const [select, setSelect] = useState("");
+  const sel = useRef("aaa");
   useEffect(() => {
     // if (canvas) return;
     // canvasを取得
     let stats = initStats();
     let scene = new THREE.Scene();
+
+    let intersectObjects = [];
 
     let camera = new THREE.PerspectiveCamera(
       45,
@@ -61,10 +64,13 @@ export default function Home() {
     scene.add(Objects.floor);
     scene.add(Objects.leftWall);
     scene.add(Objects.rightWall);
+    intersectObjects.push(Objects.floor);
+    intersectObjects.push(Objects.leftWall);
+    intersectObjects.push(Objects.rightWall);
 
     let plane = textToTextureConvertReturnMesh();
     plane.position.y = 5;
-    plane.position.x = -10;
+    plane.position.x = 10;
     plane.name = "plane";
     let plane2 = textToTextureConvertReturnMesh();
     plane2.position.y = 10;
@@ -74,9 +80,9 @@ export default function Home() {
     scene.add(plane);
     scene.add(plane2);
     let selectObjectText = textToTextureConvertReturnMesh();
-    selectObjectText.position.y = 10;
-    selectObjectText.position.x = -15;
-    selectObjectText.scale.set(2, 2, 2);
+    selectObjectText.position.y = 15;
+    selectObjectText.position.x = 0;
+    selectObjectText.scale.set(3, 3, 3);
     selectObjectText.name = "plane";
     scene.add(selectObjectText);
 
@@ -119,9 +125,8 @@ export default function Home() {
       plane.quaternion.copy(camera.quaternion);
       plane2.update(Date.now());
       plane2.quaternion.copy(camera.quaternion);
-      selectObjectText.update(select);
+      selectObjectText.update(sel.current);
       selectObjectText.quaternion.copy(camera.quaternion);
-      console.log(select);
       requestAnimationFrame(render);
       renderer.render(scene, camera);
     }
@@ -155,10 +160,11 @@ export default function Home() {
       );
       raycaster.setFromCamera(vector, camera);
 
-      const intersects = raycaster.intersectObjects(scene.children);
+      const intersects = raycaster.intersectObjects(intersectObjects);
       if (intersects.length) {
-        // console.log(intersects[0].object.name);
-        setSelect(intersects[0].object.name);
+        console.log(intersects[0].object.name);
+        // setSelect(intersects[0].object.name);
+        sel.current = intersects[0].object.name;
         if (intersects[0].object.log) {
           window.clearTimeout(timer);
           timer = window.setTimeout(() => intersects[0].object.log(""), 100);
