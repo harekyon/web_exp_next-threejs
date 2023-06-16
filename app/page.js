@@ -2,7 +2,7 @@
 
 // basis
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // extension lib
 import * as Stats from "stats-js";
@@ -14,13 +14,13 @@ import { orbitControler } from "../Modules/orbitControler.js";
 
 // original functions
 import * as Objects from "../Objects/Structure.js";
-import { textToTextureConvert } from "../Modules/tools.js";
+import { textToTextureConvertReturnMesh } from "../Modules/tools.js";
 
 // value
 
 export default function Home() {
+  const [select, setSelect] = useState("WELCOME");
   useEffect(() => {
-    console.log(textToTextureConvert);
     // if (canvas) return;
     // canvasを取得
     let stats = initStats();
@@ -36,7 +36,7 @@ export default function Home() {
     camera.position.x = -30;
     camera.position.y = 40;
     camera.position.z = 30;
-    camera.lookAt(scene.position);
+    // camera.lookAt(scene.position);
 
     let renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0x010103));
@@ -62,39 +62,23 @@ export default function Home() {
     scene.add(Objects.leftWall);
     scene.add(Objects.rightWall);
 
-    let bitmap = document.createElement("canvas");
-    let g = bitmap.getContext("2d");
-    let text = "nyoooonaaaaaaaaaaa";
-    bitmap.width = 200;
-    bitmap.height = 200;
-    g.font = "Bold 10px Arial";
-    g.fillStyle = "white";
-    g.fillText(text, 0, 10);
-    g.strokeStyle = "black";
-    g.strokeText(text, 0, 10);
-
-    let texture = new THREE.Texture(bitmap);
-    texture.needsUpdate = true;
-
-    let planeStatusGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
-    let planeStatusMaterial = new THREE.MeshStandardMaterial({
-      map: texture,
-    });
-    let planeStatusMesh = new THREE.Mesh(
-      planeStatusGeometry,
-      planeStatusMaterial
-    );
-
-    const options = {
-      fontSize: "10px",
-      text: "harepoko",
-    };
-    scene.add(textToTextureConvert(planeStatusGeometry, options));
-
-    planeStatusMesh.position.y = 5;
-    planeStatusMesh.position.x = -10;
-    planeStatusMesh.name = "plane";
-    scene.add(planeStatusMesh);
+    let plane = textToTextureConvertReturnMesh();
+    plane.position.y = 5;
+    plane.position.x = -10;
+    plane.name = "plane";
+    let plane2 = textToTextureConvertReturnMesh();
+    plane2.position.y = 10;
+    plane2.position.x = -15;
+    plane2.scale.set(2, 2, 2);
+    plane2.name = "plane";
+    scene.add(plane);
+    scene.add(plane2);
+    let selectObjectText = textToTextureConvertReturnMesh();
+    selectObjectText.position.y = 10;
+    selectObjectText.position.x = -15;
+    selectObjectText.scale.set(2, 2, 2);
+    selectObjectText.name = "plane";
+    scene.add(selectObjectText);
 
     let ambientLight = new THREE.AmbientLight(0x444444);
     scene.add(ambientLight);
@@ -110,17 +94,19 @@ export default function Home() {
     let controls = new (function () {
       this.rotationSpeed = 0.0;
       this.statusRotateSpeed = 0.0;
+      this.textValue = 0;
     })();
 
     let gui = new dat.GUI();
     gui.add(controls, "rotationSpeed", 0, 0.5);
     gui.add(controls, "statusRotateSpeed", -0.3, 0.3);
+    gui.add(controls, "textValue", -1000000, 1000000);
 
     render();
 
     function render() {
       stats.update();
-      planeStatusMesh.rotation.y += controls.statusRotateSpeed;
+      // planeStatusMesh.rotation.y += controls.statusRotateSpeed;
       scene.traverse(function (obj) {
         if (obj instanceof THREE.Mesh && obj != Objects.floor) {
           obj.rotation.x += controls.rotationSpeed;
@@ -129,6 +115,13 @@ export default function Home() {
         }
       });
       orbitControl.instance.update(orbitControler.delta);
+      plane.update(Date.now());
+      plane.quaternion.copy(camera.quaternion);
+      plane2.update(Date.now());
+      plane2.quaternion.copy(camera.quaternion);
+      selectObjectText.update(select);
+      selectObjectText.quaternion.copy(camera.quaternion);
+      console.log(select);
       requestAnimationFrame(render);
       renderer.render(scene, camera);
     }
@@ -164,7 +157,8 @@ export default function Home() {
 
       const intersects = raycaster.intersectObjects(scene.children);
       if (intersects.length) {
-        console.log(intersects[0].object.name);
+        // console.log(intersects[0].object.name);
+        setSelect(intersects[0].object.name);
         if (intersects[0].object.log) {
           window.clearTimeout(timer);
           timer = window.setTimeout(() => intersects[0].object.log(""), 100);

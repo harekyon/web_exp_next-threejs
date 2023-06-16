@@ -8,67 +8,46 @@ function autoInitTexture(textureObj) {
 }
 export { autoInitTexture };
 
-function textToTextureConvert(geom, options) {
-  //   const canvas = document.createElement("canvas");
-  //   const ctx = canvas.getContext("2d");
-  // //   const dpr = Math.min(window.devicePixelRatio, 2);
-
-  //   const fontFamily = "monospace";
-  //   ctx.font = `bold ${options.fontSize * dpr}px '${fontFamily}'`;
-  //   const textWidth = ctx.measureText(options.text);
-
-  //   const width = textWidth.width;
-  //   const height = options.fontSize * dpr * 0.8;
-
-  //   canvas.width = width;
-  //   canvas.height = height;
-  //   ctx.font = `bold ${options.fontSize * dpr}px '${fontFamily}'`;
-  //   ctx.textAlign = "left";
-  //   ctx.textBaseline = "hanging";
-  //   ctx.fillstyle = "rgba(255,255,255,1.0)";
-  //   ctx.fillText(options.text, -5, 0);
-
-  //   const texture = new THREE.CanvasTexture(canvas);
-  //   texture.needsUpdate = false;
-  //   texture.minFilter = THREE.LinearFilter;
-  //   texture.magFilter = THREE.LinearFilter;
-  //   texture.format = THREE.RGBAFormat;
-
-  let canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  const dpr = Math.min(window.devicePixelRatio, 2);
-
-  ctx.font = "48px serif";
-  ctx.fillText("nyoooooon", 10, 50);
-  ctx.fillStyle = "rgba(255,255,255,1.0)";
-  console.log(ctx);
-  //   const fontFamily = "monospace";
-  //   ctx.font = `bold ${options.fontSize * dpr}px '${fontFamily}'`;
-  //   const textWidth = ctx.measureText(options.text);
-
-  //   const width = textWidth.width;
-  //   const height = options.fontSize * dpr * 0.8;
-
-  //   canvas.width = width;
-  //   canvas.height = height;
-  //   ctx.font = `bold ${options.fontSize * dpr}px '${fontFamily}'`;
-  //   ctx.textAlign = "left";
-  //   ctx.textBaseline = "hanging";
-  //   ctx.fillstyle = "rgba(255,255,255,1.0)";
-  //   ctx.fillText(options.text, -5, 0);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  //   texture.needsUpdate = false;
-  //   texture.minFilter = THREE.LinearFilter;
-  //   texture.magFilter = THREE.LinearFilter;
-  //   texture.format = THREE.RGBAFormat;
-
-  texture.needsUpdate = true;
-
-  let canvasMap = new THREE.Texture(canvas);
-  let mat = new THREE.MeshPhongMaterial();
-  mat.map = texture;
-  let mesh = new THREE.Mesh(geom, mat);
-  return mesh;
+//renderでupdate()を書けばテキストを再描画してくれる
+function textToTextureConvertReturnMesh(canvasSize = 500, fontSize = 50) {
+  const bitmap = document.createElement("canvas");
+  const g = bitmap.getContext("2d");
+  let refleshText = "refleshText";
+  console.log(g.measureText(refleshText));
+  bitmap.width = canvasSize;
+  bitmap.height = canvasSize;
+  g.font = `Bold ${fontSize}px Arial`;
+  const planeStatusGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
+  const texture = new THREE.Texture(bitmap);
+  const planeStatusMaterial = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+  });
+  function update(text) {
+    refleshText = text;
+    // console.log(g.measureText(refleshText));
+    g.clearRect(0, 0, bitmap.width, bitmap.height);
+    g.fillStyle = "white";
+    g.textAlign = "left";
+    g.fillText(
+      text,
+      canvasSize / 2 - g.measureText(text).width / 2,
+      (canvasSize + fontSize / 2) / 2
+    );
+    // console.log(g.actualBoundingBoxAscent + g.actualBoundingBoxDescent);
+    g.strokeStyle = "black";
+    g.strokeText(
+      text,
+      canvasSize / 2 - g.measureText(text).width / 2,
+      (canvasSize + fontSize / 2) / 2
+    );
+    texture.needsUpdate = true;
+  }
+  const planeStatusMesh = new THREE.Mesh(
+    planeStatusGeometry,
+    planeStatusMaterial
+  );
+  planeStatusMesh.update = update;
+  return planeStatusMesh;
 }
-export { textToTextureConvert };
+export { textToTextureConvertReturnMesh };
