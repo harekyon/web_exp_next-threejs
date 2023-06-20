@@ -51,3 +51,8 @@ function textToTextureConvertReturnMesh(canvasSize = 500, fontSize = 50) {
   return planeStatusMesh;
 }
 export { textToTextureConvertReturnMesh };
+
+const calcRadian = (rot) => {
+  return (rot * Math.PI) / 180;
+};
+export { calcRadian };

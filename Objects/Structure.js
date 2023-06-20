@@ -74,6 +74,7 @@ floor.position.x = 0;
 floor.position.y = 0;
 floor.position.z = 0;
 floor.name = "floor";
+floor.castShadow = true;
 let leftWall = new THREE.Mesh(planeGeometry, wallMaterials);
 leftWall.receiveShadow = true;
 leftWall.rotation.z = 0.5 * Math.PI;
