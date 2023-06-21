@@ -10,7 +10,7 @@ import GUI from "lil-gui";
 
 // three lib
 import * as THREE from "three";
-import { orbitControler } from "../Modules/orbitControler.js";
+import { orbitControler } from "/Modules/orbitControler.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { RectAreaLightHelper } from "three/addons/helpers/RectAreaLightHelper.js";
@@ -18,7 +18,7 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 // import hdr1 from "/public/brown_photostudio_02_1k.hdr";
 
 // original functions
-import * as Objects from "../Objects/Structure.js";
+import * as Objects from "/Objects/Structure.js";
 import { calcRadian } from "/Modules/tools.js";
 import { textToTextureConvertReturnMesh } from "/Modules/tools.js";
 import { cameraControler } from "@/Modules/cameraControler.js";
@@ -283,7 +283,7 @@ export default function Home() {
     }
     console.log(pointLights[5]);
     pointLights[5].castShadow = true;
-    // gui.add();
+
     function capitalize(str) {
       if (typeof str !== "string" || !str) return str;
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
