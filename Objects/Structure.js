@@ -20,9 +20,9 @@ let floorTex = {
   texNormal: textureLoader.load(
     "/laminate_floor_03_2k/textures/laminate_floor_03_nor_dx_2k.jpg"
   ),
-  texDisp: textureLoader.load(
-    "/laminate_floor_03_2k/textures/laminate_floor_03_disp_2k.jpg"
-  ),
+  // texDisp: textureLoader.load(
+  //   "/laminate_floor_03_2k/textures/laminate_floor_03_disp_2k.jpg"
+  // ),
   texRough: textureLoader.load(
     "/laminate_floor_03_2k/textures/laminate_floor_03_rough_2k.jpg"
   ),
@@ -34,7 +34,7 @@ floorTex.texDiff.rotation = -0.5 * Math.PI;
 Tools.autoInitTexture(floorTex.texDiff);
 Tools.autoInitTexture(floorTex.texAo);
 Tools.autoInitTexture(floorTex.texNormal);
-Tools.autoInitTexture(floorTex.texDisp);
+// Tools.autoInitTexture(floorTex.texDisp);
 Tools.autoInitTexture(floorTex.texRough);
 
 let wallTex = {
@@ -74,6 +74,8 @@ floor.position.x = 0;
 floor.position.y = 0;
 floor.position.z = 0;
 floor.name = "floor";
+floor.castShadow = true;
+floor.receiveShadow = true;
 let leftWall = new THREE.Mesh(planeGeometry, wallMaterials);
 leftWall.receiveShadow = true;
 leftWall.rotation.z = 0.5 * Math.PI;

@@ -11,10 +11,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <script
-        type="module"
-        src="https://unpkg.com/browse/three@0.153.0/examples/jsm/"
-      ></script>
       <body className={inter.className}>{children}</body>
     </html>
   );
