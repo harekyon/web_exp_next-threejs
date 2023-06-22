@@ -6,7 +6,7 @@ let aaa = "nyo~n";
 function ffff() {
   console.log("nyoooooooooon");
 }
-let planeGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
+let planeGeometry = new THREE.PlaneGeometry(42, 42, 1, 1);
 let textureLoader = new THREE.TextureLoader();
 let floorTex = {
   texDiff: textureLoader.load(
@@ -80,15 +80,22 @@ let leftWall = new THREE.Mesh(planeGeometry, wallMaterials);
 leftWall.receiveShadow = true;
 leftWall.rotation.z = 0.5 * Math.PI;
 leftWall.position.x = 0;
-leftWall.position.y = 25;
-leftWall.position.z = -25;
+leftWall.position.y = 21;
+leftWall.position.z = -21;
 leftWall.name = "leftWall";
 let rightWall = new THREE.Mesh(planeGeometry, wallMaterials);
 rightWall.receiveShadow = true;
 rightWall.rotation.y = -0.5 * Math.PI;
-rightWall.position.x = 25;
-rightWall.position.y = 25;
+rightWall.position.x = 21;
+rightWall.position.y = 21;
 rightWall.position.z = 0;
 rightWall.name = "rightWall";
+let frontWall = new THREE.Mesh(planeGeometry, wallMaterials);
+frontWall.receiveShadow = true;
+frontWall.rotation.y = -Math.PI;
+frontWall.position.x = 0;
+frontWall.position.y = 21;
+frontWall.position.z = 21;
+frontWall.name = "frontWall";
 
-export { floor, leftWall, rightWall };
+export { floor, leftWall, rightWall, frontWall };

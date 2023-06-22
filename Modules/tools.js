@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 function autoInitTexture(textureObj) {
   textureObj.wrapS = THREE.RepeatWrapping;
@@ -52,7 +53,42 @@ function textToTextureConvertReturnMesh(canvasSize = 500, fontSize = 50) {
 }
 export { textToTextureConvertReturnMesh };
 
+//degreeに変換する
 const calcRadian = (rot) => {
   return (rot * Math.PI) / 180;
 };
 export { calcRadian };
+
+//gltf
+function exportGltf({ glbPath = "/display.glb", transparent = false }) {
+  const gltfObjWrap = new THREE.Object3D();
+  const loader = new GLTFLoader();
+  loader.load(
+    glbPath,
+    function (gltf) {
+      const gltfObj = gltf.scene;
+      gltfObj.animations;
+      gltfObj.scene;
+      gltfObj.scenes;
+      gltfObj.cameras;
+      gltfObj.asset;
+      gltf.scene.traverse(function (node) {
+        if (node.isMesh) {
+          console.log(node.isMesh);
+          node.material.transparent = transparent;
+
+          node.castShadow = true;
+        }
+      });
+      gltfObjWrap.add(gltfObj);
+    },
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+    },
+    function (error) {
+      console.log("An error happend");
+    }
+  );
+  return gltfObjWrap;
+}
+export { exportGltf };

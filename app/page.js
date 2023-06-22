@@ -13,7 +13,6 @@ import * as THREE from "three";
 import { orbitControler } from "../Modules/orbitControler.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import { RectAreaLightHelper } from "three/addons/helpers/RectAreaLightHelper.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 // import hdr1 from "/public/brown_photostudio_02_1k.hdr";
 
@@ -22,6 +21,7 @@ import * as Objects from "../Objects/Structure.js";
 import { calcRadian } from "/Modules/tools.js";
 import { textToTextureConvertReturnMesh } from "/Modules/tools.js";
 import { cameraControler } from "@/Modules/cameraControler.js";
+import { exportGltf } from "@/Modules/tools.js";
 
 export default function Home() {
   const sel = useRef("aaa");
@@ -32,6 +32,7 @@ export default function Home() {
   useEffect(() => {
     let stats = initStats();
     let scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x000000, 50, 2000);
     let camera = new THREE.PerspectiveCamera(
       45,
       window.innerWidth / window.innerHeight,
@@ -45,9 +46,11 @@ export default function Home() {
     scene.add(camera);
 
     let renderer = new THREE.WebGLRenderer();
-    renderer.setClearColor(new THREE.Color(0x010103));
+    renderer.setClearColor(new THREE.Color(0x000000));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
+    renderer.toneMapping = THREE.ReinhardToneMapping;
+    renderer.toneMappingExposure = 0.2;
 
     let intersectObjects = [];
     let orbitControl = orbitControler(camera, renderer);
@@ -58,6 +61,8 @@ export default function Home() {
     scene.add(Objects.floor);
     scene.add(Objects.leftWall);
     scene.add(Objects.rightWall);
+    // scene.add(Objects.frontWall);
+
     intersectObjects.push(Objects.floor);
     intersectObjects.push(Objects.leftWall);
     intersectObjects.push(Objects.rightWall);
@@ -71,76 +76,119 @@ export default function Home() {
     plane2.position.x = -15;
     plane2.scale.set(2, 2, 2);
     plane2.name = "plane";
-    scene.add(plane);
-    scene.add(plane2);
+    // scene.add(plane);
+    // scene.add(plane2);
     let selectObjectText = textToTextureConvertReturnMesh();
     selectObjectText.position.y = 15;
     selectObjectText.position.x = 0;
     selectObjectText.scale.set(3, 3, 3);
     selectObjectText.name = "plane";
-    scene.add(selectObjectText);
+    // scene.add(selectObjectText);
 
-    const displayWrap = new THREE.Object3D();
-    displayWrap.rotation.y = (Math.PI / 180) * -90;
-    displayWrap.position.x = 23;
-    displayWrap.position.y = 10;
-    displayWrap.receiveShadow = true;
-    console.log((Math.PI / 360) * 90);
-    scene.add(displayWrap);
-    loader.load(
-      "/display.glb",
-      function (gltf) {
-        const displayObject = gltf.scene;
-        displayObject.animations;
-        displayObject.scene;
-        displayObject.scenes;
-        displayObject.cameras;
-        displayObject.asset;
-        gltf.scene.traverse(function (node) {
-          if (node.isMesh) {
-            console.log(node.isMesh);
-            node.castShadow = true;
-          }
-        });
-        displayWrap.add(displayObject);
-      },
-      function (xhr) {
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
-      function (error) {
-        console.log("An error happend");
-      }
-    );
-    const tableWrap = new THREE.Object3D();
-    tableWrap.rotation.y = calcRadian(90);
-    tableWrap.position.y = 0.2;
-    tableWrap.receiveShadow = true;
-    scene.add(tableWrap);
-    loader.load(
-      "/table.glb",
-      function (gltf) {
-        const tableObject = gltf.scene;
-        tableObject.animations;
-        tableObject.scene;
-        tableObject.scenes;
-        tableObject.cameras;
-        tableObject.asset;
-        gltf.scene.traverse(function (node) {
-          if (node.isMesh) {
-            console.log(node.isMesh);
-            node.castShadow = true;
-            node.receiveShadow = true;
-          }
-        });
-        tableWrap.add(tableObject);
-      },
-      function (xhr) {
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
-      function (error) {
-        console.log("An error happend");
-      }
-    );
+    const displayObj = exportGltf({ glbPath: "/display.glb" });
+    displayObj.rotation.y = (Math.PI / 180) * -90;
+    displayObj.position.set(20, 10, 0);
+    displayObj.receiveShadow = true;
+    scene.add(displayObj);
+
+    const tableObj = exportGltf({ glbPath: "/table.glb" });
+    tableObj.rotation.y = calcRadian(90);
+    tableObj.position.y = 0.2;
+    tableObj.receiveShadow = true;
+    scene.add(tableObj);
+
+    const artObj = exportGltf({ glbPath: "/art.glb" });
+    artObj.rotation.y = calcRadian(-90);
+    artObj.position.set(-4, 5, -20.4);
+    artObj.scale.set(0.9, 0.9, 0.9);
+    artObj.receiveShadow = true;
+    scene.add(artObj);
+    const artGlassObj = exportGltf({
+      glbPath: "/art_glass.glb",
+      transparent: true,
+    });
+    artGlassObj.rotation.y = calcRadian(-90);
+    artGlassObj.position.set(-4, 5, -20.4);
+    artGlassObj.scale.set(0.9, 0.9, 0.9);
+    artGlassObj.receiveShadow = true;
+    scene.add(artGlassObj);
+
+    const pypeObj = exportGltf({ glbPath: "/pype.glb" });
+    pypeObj.rotation.y = calcRadian(89);
+    pypeObj.position.y = 0.2;
+    pypeObj.position.set(-12, 0.2, -18);
+    pypeObj.receiveShadow = true;
+    scene.add(pypeObj);
+
+    const rackObj = exportGltf({ glbPath: "/rack.glb" });
+    rackObj.rotation.y = calcRadian(89);
+    rackObj.position.y = 0.2;
+    rackObj.position.set(14, 0.2, -19);
+    rackObj.receiveShadow = true;
+    scene.add(rackObj);
+
+    const awardWallObj = exportGltf({
+      glbPath: "/award.glb",
+    });
+    awardWallObj.rotation.y = calcRadian(90);
+    awardWallObj.position.set(0, -0.4, 23.5);
+    awardWallObj.scale.y = 1.01;
+
+    awardWallObj.receiveShadow = true;
+    scene.add(awardWallObj);
+    const awardWallGlassObj = exportGltf({
+      glbPath: "/award_glass.glb",
+      transparent: true,
+    });
+    awardWallGlassObj.rotation.y = calcRadian(90);
+    awardWallGlassObj.position.set(0, 0, 23.5);
+    awardWallGlassObj.receiveShadow = true;
+    // scene.add(awardWallGlassObj);
+
+    const chairWhite = [];
+    for (let n = 0; n < 3; n++) {
+      chairWhite[n] = exportGltf({ glbPath: "/cheir_white.glb" });
+      chairWhite[n].receiveShadow = true;
+      scene.add(chairWhite[n]);
+    }
+    const chairBlack = [];
+    for (let n = 0; n < 3; n++) {
+      chairBlack[n] = exportGltf({ glbPath: "/cheir_black.glb" });
+      chairBlack[n].receiveShadow = true;
+      scene.add(chairBlack[n]);
+    }
+    chairWhite[0].rotation.y = calcRadian(85);
+    chairWhite[0].position.set(0, -0.4, 7);
+    chairWhite[0].scale.set(1.1, 1.1, 1.1);
+    chairBlack[0].rotation.y = calcRadian(95);
+    chairBlack[0].position.set(-9, -0.4, 6.5);
+    chairBlack[0].scale.set(1.1, 1.1, 1.1);
+    chairBlack[1].rotation.y = calcRadian(80);
+    chairBlack[1].position.set(9, -0.4, 6);
+    chairBlack[1].scale.set(1.1, 1.1, 1.1);
+
+    chairBlack[2].rotation.y = calcRadian(-93);
+    chairBlack[2].position.set(0, -0.4, -7);
+    chairBlack[2].scale.set(1.1, 1.1, 1.1);
+    chairWhite[1].rotation.y = calcRadian(-95);
+    chairWhite[1].position.set(-9, -0.4, -7);
+    chairWhite[1].scale.set(1.1, 1.1, 1.1);
+    chairWhite[2].rotation.y = calcRadian(-90);
+    chairWhite[2].position.set(9, -0.4, -7);
+    chairWhite[2].scale.set(1.1, 1.1, 1.1);
+
+    let hdrObj = new RGBELoader().load("/hdr.hdr", function (texture) {
+      let hdrImg = new THREE.MeshStandardMaterial({ map: texture });
+      hdrImg.envMapIntensity = 0.1;
+      hdrImg.envMap = texture;
+      console.log(hdrImg);
+      hdrImg.map.mapping = THREE.EquirectangularReflectionMapping;
+      let aaaa = texture;
+      aaaa.repeat.set(0.5, 0.5);
+      scene.environment = aaaa; // 解像度の低いテクスチャを使用
+    });
+    console.log(hdrObj);
+
     let RoomLightArray = [];
     for (let n = 0; n < 6; n++) {
       RoomLightArray.push({
@@ -151,6 +199,31 @@ export default function Home() {
         posY: 0,
         posZ: 0,
       });
+    }
+    let ambientLight = new THREE.AmbientLight(0x444444);
+    scene.add(ambientLight);
+
+    let outSideLight = new THREE.PointLight(0xffffff);
+    outSideLight.penumbra = 0.5;
+    outSideLight.angle = 0.5;
+    outSideLight.intensity = 1;
+    outSideLight.castShadow = true;
+    scene.add(outSideLight);
+    let outSideLightHelper = new THREE.PointLightHelper(outSideLight, 5);
+    scene.add(outSideLightHelper);
+
+    let pointLights = [];
+    let pointLightsHelpers = [];
+    for (let n = 0; n < 6; n++) {
+      pointLights.push(new THREE.SpotLight(0x887788));
+      pointLightsHelpers.push(new THREE.SpotLightHelper(pointLights[n], 5));
+      pointLights[n].penumbra = 0.8;
+      pointLights[n].angle = 0.9;
+      pointLights[n].castShadow = true;
+      pointLights[n].shadowMapWidth = 2048;
+      pointLights[n].shadowMapHeight = 2048;
+      pointLights[n].shadow.radius = 3;
+      scene.add(pointLights[n]);
     }
 
     let controls = {
@@ -168,25 +241,22 @@ export default function Home() {
       },
       myDropDowns: "select1",
       myColor: 0xff0000,
-      rectAreaLightPosX: 0,
-      rectAreaLightPosY: 0,
-      rectAreaLightPosZ: 0,
-      rectAreaLightRotX: 0,
-      rectAreaLightRotY: 0,
-      rectAreaLightRotZ: 0,
+      outSideLightPosX: 0,
+      outSideLightPosY: 27,
+      outSideLightPosZ: 32,
 
-      RoomLight0Color: 0xffdd9e,
-      RoomLight1Color: 0xffdd9e,
-      RoomLight2Color: 0xffdd9e,
-      RoomLight3Color: 0xffdd9e,
-      RoomLight4Color: 0xffdd9e,
-      RoomLight5Color: 0xffdd9e,
-      RoomLight0Intensity: 0.4,
-      RoomLight1Intensity: 0.4,
-      RoomLight2Intensity: 0.4,
-      RoomLight3Intensity: 0.4,
-      RoomLight4Intensity: 0.4,
-      RoomLight5Intensity: 0.4,
+      RoomLight0Color: 0xfebe48,
+      RoomLight1Color: 0xffc966,
+      RoomLight2Color: 0xfebe48,
+      RoomLight3Color: 0xffc966,
+      RoomLight4Color: 0xfebe48,
+      RoomLight5Color: 0xffc966,
+      RoomLight0Intensity: 1.3,
+      RoomLight1Intensity: 1.3,
+      RoomLight2Intensity: 1.3,
+      RoomLight3Intensity: 1.3,
+      RoomLight4Intensity: 1.3,
+      RoomLight5Intensity: 1.3,
       RoomLight0PosX: 17,
       RoomLight1PosX: 0,
       RoomLight2PosX: -17,
@@ -220,7 +290,7 @@ export default function Home() {
     for (let n = 0; n < 6; n++) {
       folderArray[n] = gui.addFolder(capitalize(`${RoomLightArray[n].name}`));
       folderArray[n].close();
-      console.log(folderArray[n]);
+      // console.log(folderArray[n]);
       folderArray[n].addColor(controls, `${RoomLightArray[n].name}Color`);
       folderArray[n].add(
         controls,
@@ -251,39 +321,11 @@ export default function Home() {
         0.1
       );
     }
-    let rectAreaLightFolder = gui.addFolder("rectAreaLight");
-    rectAreaLightFolder.add(controls, "rectAreaLightPosX", -50, 50, 1);
-    rectAreaLightFolder.add(controls, "rectAreaLightPosY", -50, 50, 1);
-    rectAreaLightFolder.add(controls, "rectAreaLightPosZ", -50, 50, 1);
-    rectAreaLightFolder.add(controls, "rectAreaLightRotX", 0, 360, 1);
-    rectAreaLightFolder.add(controls, "rectAreaLightRotY", 0, 360, 1);
-    rectAreaLightFolder.add(controls, "rectAreaLightRotZ", 0, 360, 1);
+    let outSideLightFolder = gui.addFolder("outSideLight");
+    outSideLightFolder.add(controls, "outSideLightPosX", -50, 50, 1);
+    outSideLightFolder.add(controls, "outSideLightPosY", -50, 50, 1);
+    outSideLightFolder.add(controls, "outSideLightPosZ", -50, 50, 1);
 
-    let ambientLight = new THREE.AmbientLight(0x444444);
-    scene.add(ambientLight);
-
-    let rectAreaLight = new THREE.SpotLight(0xffffff);
-    rectAreaLight.penumbra = 0.5;
-    rectAreaLight.angle = 0.5;
-    scene.add(rectAreaLight);
-    let rectAreaLightHelper = new THREE.SpotLightHelper(rectAreaLight, 5);
-    scene.add(rectAreaLightHelper);
-
-    let pointLights = [];
-    let pointLightsHelpers = [];
-    for (let n = 0; n < 6; n++) {
-      pointLights.push(new THREE.SpotLight(0x887788));
-      pointLightsHelpers.push(new THREE.SpotLightHelper(pointLights[n], 5));
-      pointLights[n].penumbra = 0.8;
-      pointLights[n].angle = 0.9;
-      pointLights[n].castShadow = true;
-      pointLights[n].shadowMapWidth = 2048;
-      pointLights[n].shadowMapHeight = 2048;
-      pointLights[n].shadow.radius = 3;
-      scene.add(pointLights[n]);
-    }
-    console.log(pointLights[5]);
-    pointLights[5].castShadow = true;
     // gui.add();
     function capitalize(str) {
       if (typeof str !== "string" || !str) return str;
@@ -315,6 +357,16 @@ export default function Home() {
         scene.add(pointLights[n]);
         scene.add(pointLightsHelpers[n]);
       }
+      outSideLight.position.set(
+        controls.outSideLightPosX,
+        controls.outSideLightPosY,
+        controls.outSideLightPosZ
+      );
+      outSideLight.rotation.set(
+        calcRadian(controls.outSideLightRotX),
+        calcRadian(controls.outSideLightRotY),
+        calcRadian(controls.outSideLightRotZ)
+      );
 
       requestAnimationFrame(render);
       renderer.render(scene, camera);
