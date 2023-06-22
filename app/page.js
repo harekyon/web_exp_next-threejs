@@ -277,8 +277,9 @@ export default function Home() {
       pointLights[n].penumbra = 0.8;
       pointLights[n].angle = 0.9;
       pointLights[n].castShadow = true;
-      pointLights[n].shadowMapWidth = 2048; // これ!
-      pointLights[n].shadowMapHeight = 2048; // これ!
+      pointLights[n].shadowMapWidth = 2048;
+      pointLights[n].shadowMapHeight = 2048;
+      pointLights[n].shadow.radius = 3;
       scene.add(pointLights[n]);
     }
     console.log(pointLights[5]);
