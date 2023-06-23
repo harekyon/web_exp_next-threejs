@@ -206,7 +206,7 @@ export default function Home() {
     let outSideLight = new THREE.PointLight(0xffffff);
     outSideLight.penumbra = 0.5;
     outSideLight.angle = 0.5;
-    outSideLight.intensity = 1;
+    outSideLight.intensity = 0.2;
     outSideLight.castShadow = true;
     scene.add(outSideLight);
     let outSideLightHelper = new THREE.PointLightHelper(outSideLight, 5);
