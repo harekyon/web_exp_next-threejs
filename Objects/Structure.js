@@ -34,7 +34,6 @@ floorTex.texDiff.rotation = -0.5 * Math.PI;
 Tools.autoInitTexture(floorTex.texDiff);
 Tools.autoInitTexture(floorTex.texAo);
 Tools.autoInitTexture(floorTex.texNormal);
-// Tools.autoInitTexture(floorTex.texDisp);
 Tools.autoInitTexture(floorTex.texRough);
 
 let wallTex = {

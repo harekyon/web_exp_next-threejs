@@ -133,7 +133,6 @@ export default function Home() {
     awardWallObj.rotation.y = calcRadian(90);
     awardWallObj.position.set(0, -0.4, 23.5);
     awardWallObj.scale.y = 1.01;
-
     awardWallObj.receiveShadow = true;
     scene.add(awardWallObj);
     const awardWallGlassObj = exportGltf({
@@ -144,6 +143,13 @@ export default function Home() {
     awardWallGlassObj.position.set(0, 0, 23.5);
     awardWallGlassObj.receiveShadow = true;
     // scene.add(awardWallGlassObj);
+    const book1 = exportGltf({ glbPath: "/book.glb" });
+    // book1.rotation.y = calcRadian(90);
+    // book1.position.y = 0.2;
+    book1.receiveShadow = true;
+    book1.position.set(0, 8.28, 0);
+    book1.rotation.set(0, calcRadian(74), 0);
+    scene.add(book1);
 
     const chairWhite = [];
     for (let n = 0; n < 3; n++) {
