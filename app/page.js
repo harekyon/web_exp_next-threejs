@@ -22,13 +22,15 @@ import { calcRadian } from "/Modules/tools.js";
 import { textToTextureConvertReturnMesh } from "/Modules/tools.js";
 import { cameraControler } from "@/Modules/cameraControler.js";
 import { exportGltf } from "@/Modules/tools.js";
+import { simpleAnnotation } from "@/Modules/annotation.js";
 
 export default function Home() {
   const sel = useRef("aaa");
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
   loader.setDRACOLoader(dracoLoader);
-
+  //objs: returnHoverObj関数で使用。hoverしたMeshを返してくれる
+  const objs = useRef("");
   useEffect(() => {
     let stats = initStats();
     let scene = new THREE.Scene();
@@ -51,6 +53,7 @@ export default function Home() {
     renderer.shadowMap.enabled = true;
     renderer.toneMapping = THREE.ReinhardToneMapping;
     renderer.toneMappingExposure = 0.2;
+    renderer.domElement.id = "main-canvas";
 
     let intersectObjects = [];
     let orbitControl = orbitControler(camera, renderer);
@@ -144,12 +147,19 @@ export default function Home() {
     awardWallGlassObj.receiveShadow = true;
     // scene.add(awardWallGlassObj);
     const book1 = exportGltf({ glbPath: "/book.glb" });
-    // book1.rotation.y = calcRadian(90);
-    // book1.position.y = 0.2;
     book1.receiveShadow = true;
     book1.position.set(0, 8.28, 0);
     book1.rotation.set(0, calcRadian(74), 0);
+    book1.name = "redbook";
+    console.log(book1);
     scene.add(book1);
+
+    const book2 = exportGltf({ glbPath: "/book.glb" });
+    book2.receiveShadow = true;
+    book2.position.set(4, 8.28, -5);
+    book2.rotation.set(0, calcRadian(74), 0);
+    book2.name = "bluebook";
+    scene.add(book2);
 
     const chairWhite = [];
     for (let n = 0; n < 3; n++) {
@@ -337,6 +347,74 @@ export default function Home() {
       if (typeof str !== "string" || !str) return str;
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     }
+
+    // const bookPosition = book1.getWorldPosition(new THREE.Vector3());
+    // let projection = bookPosition.project(camera);
+    // let sx = (window.innerWidth / 2) * (projection.x + 1.0);
+    // let sy = (window.innerHeight / 2) * (-projection.x + 1.0);
+    // console.log(`sx:${sx}, sy:${sy}`);
+
+    // vector.project(camera);
+
+    // vector.x = Math.round(
+    //   (0.5 + vector.x / 2) * (canvas.width / window.devicePixelRatio)
+    // );
+    // vector.y = Math.round(
+    //   (0.5 - vector.y / 2) * (canvas.height / window.devicePixelRatio)
+    // );
+
+    // const annotation = document.querySelector(".annotation");
+    // annotation.style.top = `${vector.y}px`;
+    // annotation.style.left = `${vector.x}px`;
+
+    // const y = 32;
+    // const radius = 30;
+    // const startAngle = 30;
+    // const endAngle = Math.PI * 2;
+
+    // console.log(ctx);
+    // ctx.fillStyle = "rgb(0, 0, 0)";
+    // ctx.beginPath();
+    // ctx.arc(x, y, radius, startAngle, endAngle);
+    // ctx.fill();
+
+    // ctx.strokeStyle = "rgb(255, 255, 255)";
+    // ctx.lineWidth = 3;
+    // ctx.beginPath();
+    // ctx.arc(x, y, radius, startAngle, endAngle);
+    // ctx.stroke();
+
+    // ctx.fillStyle = "rgb(255, 255, 255)";
+    // ctx.font = "32px sans-serif";
+    // ctx.textAlign = "center";
+    // ctx.textBaseline = "middle";
+    // ctx.fillText("1", x, y);
+
+    // const numberTexture = new THREE.CanvasTexture(
+    //   document.querySelector("#number")
+    // );
+
+    // const spriteMaterial = new THREE.SpriteMaterial({
+    //   map: numberTexture,
+    //   alphaTest: 0.5,
+    //   transparent: true,
+    //   depthTest: false,
+    //   depthWrite: false,
+    // });
+
+    // let sprite = new THREE.Sprite(spriteMaterial);
+    // sprite.position.set(250, 250, 250);
+    // sprite.scale.set(35, 35, 1);
+
+    // scene.add(sprite);
+
+    // const meshDistance = camera.position.distanceTo(mesh.position);
+    // const spriteDistance = camera.position.distanceTo(sprite.position);
+    // spriteBehindObject = spriteDistance > meshDistance;
+
+    // sprite.material.opacity = spriteBehindObject ? 0.25 : 1;
+    // annotation.style.opacity = spriteBehindObject ? 0.25 : 1;
+
     document.getElementById("WebGL-output").appendChild(renderer.domElement);
     render();
 
@@ -350,6 +428,32 @@ export default function Home() {
       plane2.quaternion.copy(camera.quaternion);
       selectObjectText.update(sel.current);
       selectObjectText.quaternion.copy(camera.quaternion);
+      // const bookPosition = book1.getWorldPosition(new THREE.Vector3());
+      // const projection = bookPosition.project(camera);
+      // const sx = (window.innerWidth / 2) * (projection.x + 1.0);
+      // const sy = (window.innerHeight / 2) * (-projection.y + 1.0);
+      // // console.log(projection);
+      // console.log(`sx:${sx}, sy:${sy}`);
+      // const annotation = document.querySelector(".annotation");
+      // annotation.style.transform = `translate(${sx}px, ${sy}px)`;
+      simpleAnnotation({
+        mesh: book1,
+        camera: camera,
+        domId: "annotation1",
+        addClassWrapElement: ["simple-annotation--wrap"],
+        addTextTitle: "RED BOOK",
+        addTextAbs: "クリックでアノテーションを表示する",
+      });
+      simpleAnnotation({
+        mesh: book2,
+        camera: camera,
+        domId: "annotation2",
+        addClassWrapElement: ["simple-annotation--wrap"],
+        addTextTitle: "BLUE BOOK",
+        addTextAbs: "クリックでパーティクルを表示する",
+      });
+      // annotation.style.top = `${sy}px`;
+      // annotation.style.left = `${sx}px`;
 
       for (let n = 0; n < 6; n++) {
         pointLights[n].color.setHex(controls[eval(`"RoomLight${n}Color"`)]);
@@ -420,9 +524,36 @@ export default function Home() {
       }
       console.log("run");
     }
+
+    window.addEventListener("mousemove", returnHoverObj);
+    function returnHoverObj(e) {
+      // console.log(book1.name);
+      let mouseX =
+        ((e.offsetX - window.innerWidth / 2) / window.innerWidth) * 2;
+      let mouseY =
+        ((-e.offsetY + window.innerHeight / 2) / window.innerHeight) * 2;
+      let pos = new THREE.Vector3(mouseX, mouseY, 1);
+      pos.unproject(camera);
+      let ray = new THREE.Raycaster(
+        camera.position,
+        pos.sub(camera.position).normalize()
+      );
+      objs.current = ray.intersectObjects(scene.children);
+
+      let objsResult = objs.current.map((obj) => {
+        console.log(obj.object);
+        if (obj.object.name === "redbook") {
+          console.log(objsResult);
+        }
+      });
+    }
   }, []);
   return (
     <>
+      {/* <div className="annotation" id="annotation1">
+        <p>Book</p>
+        <p>three.js practices.</p>
+      </div> */}
       <div id="Stats-output"></div>
       <div id="WebGL-output"></div>
     </>
