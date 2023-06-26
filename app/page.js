@@ -17,12 +17,12 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 // import hdr1 from "/public/brown_photostudio_02_1k.hdr";
 
 // original functions
-import * as Objects from "../Objects/Structure.js";
 import { calcRadian } from "/Modules/tools.js";
 import { textToTextureConvertReturnMesh } from "/Modules/tools.js";
 import { cameraControler } from "@/Modules/cameraControler.js";
 import { exportGltf } from "@/Modules/tools.js";
 import { simpleAnnotation } from "@/Modules/annotation.js";
+import * as Tools from "../Modules/tools";
 
 export default function Home() {
   const sel = useRef("aaa");
@@ -61,14 +61,99 @@ export default function Home() {
     let axes = new THREE.AxesHelper(10);
     scene.add(axes);
 
-    scene.add(Objects.floor);
-    scene.add(Objects.leftWall);
-    scene.add(Objects.rightWall);
-    // scene.add(Objects.frontWall);
+    let planeGeometry = new THREE.PlaneGeometry(42, 42, 1, 1);
+    let textureLoader = new THREE.TextureLoader();
+    let floorTex = {
+      texDiff: textureLoader.load(
+        "/laminate_floor_03_2k/textures/laminate_floor_03_diff_2k.jpg"
+      ),
+      texAo: textureLoader.load(
+        "/laminate_floor_03_2k/textures/laminate_floor_03_ao_2k.jpg"
+      ),
+      texNormal: textureLoader.load(
+        "/laminate_floor_03_2k/textures/laminate_floor_03_nor_dx_2k.jpg"
+      ),
+      texRough: textureLoader.load(
+        "/laminate_floor_03_2k/textures/laminate_floor_03_rough_2k.jpg"
+      ),
+    };
+    floorTex.texDiff.wrapS = THREE.RepeatWrapping;
+    floorTex.texDiff.wrapT = THREE.RepeatWrapping;
+    floorTex.texDiff.repeat = new THREE.Vector2(2, 2);
+    floorTex.texDiff.rotation = -0.5 * Math.PI;
+    Tools.autoInitTexture(floorTex.texDiff);
+    Tools.autoInitTexture(floorTex.texAo);
+    Tools.autoInitTexture(floorTex.texNormal);
+    Tools.autoInitTexture(floorTex.texRough);
 
-    intersectObjects.push(Objects.floor);
-    intersectObjects.push(Objects.leftWall);
-    intersectObjects.push(Objects.rightWall);
+    let wallTex = {
+      texDiff: textureLoader.load(
+        "/leather_white_2k/textures/leather_white_diff_2k.jpg"
+      ),
+      texAo: textureLoader.load(
+        "/leather_white_2k/textures/leather_white_ao_2k.jpg"
+      ),
+      texNormal: textureLoader.load(
+        "/leather_white_2k/textures/leather_white_nor_gl_2k.jpg"
+      ),
+      texRough: textureLoader.load(
+        "/leather_white_2k/textures/leather_white_rough_2k.jpg"
+      ),
+    };
+    let floorMaterials = new THREE.MeshStandardMaterial({
+      map: floorTex.texDiff,
+      normalMap: floorTex.texNormal,
+      normalScale: new THREE.Vector2(1, -1),
+      aoMap: floorTex.texAo,
+      displacementMap: floorTex.texDisp,
+      roughnessMap: floorTex.texRough,
+    });
+    let wallMaterials = new THREE.MeshStandardMaterial({
+      map: wallTex.texDiff,
+      normalMap: wallTex.texNormal,
+      normalScale: new THREE.Vector2(1, -1),
+      aoMap: wallTex.texAo,
+      roughnessMap: wallTex.texRough,
+    });
+
+    let floor = new THREE.Mesh(planeGeometry, floorMaterials);
+    floor.receiveShadow = true;
+    floor.rotation.x = -0.5 * Math.PI;
+    floor.position.x = 0;
+    floor.position.y = 0;
+    floor.position.z = 0;
+    floor.name = "floor";
+    floor.castShadow = true;
+    floor.receiveShadow = true;
+    let leftWall = new THREE.Mesh(planeGeometry, wallMaterials);
+    leftWall.receiveShadow = true;
+    leftWall.rotation.z = 0.5 * Math.PI;
+    leftWall.position.x = 0;
+    leftWall.position.y = 21;
+    leftWall.position.z = -21;
+    leftWall.name = "leftWall";
+    let rightWall = new THREE.Mesh(planeGeometry, wallMaterials);
+    rightWall.receiveShadow = true;
+    rightWall.rotation.y = -0.5 * Math.PI;
+    rightWall.position.x = 21;
+    rightWall.position.y = 21;
+    rightWall.position.z = 0;
+    rightWall.name = "rightWall";
+    let frontWall = new THREE.Mesh(planeGeometry, wallMaterials);
+    frontWall.receiveShadow = true;
+    frontWall.rotation.y = -Math.PI;
+    frontWall.position.x = 0;
+    frontWall.position.y = 21;
+    frontWall.position.z = 21;
+    frontWall.name = "frontWall";
+    scene.add(floor);
+    scene.add(leftWall);
+    scene.add(rightWall);
+    // scene.add(frontWall);
+
+    intersectObjects.push(floor);
+    intersectObjects.push(leftWall);
+    intersectObjects.push(rightWall);
 
     let plane = textToTextureConvertReturnMesh();
     plane.position.y = 5;
@@ -86,7 +171,7 @@ export default function Home() {
     selectObjectText.position.x = 0;
     selectObjectText.scale.set(3, 3, 3);
     selectObjectText.name = "plane";
-    // scene.add(selectObjectText);
+    scene.add(selectObjectText);
 
     const displayObj = exportGltf({ glbPath: "/display.glb" });
     displayObj.rotation.y = (Math.PI / 180) * -90;
@@ -513,7 +598,7 @@ export default function Home() {
 
       const intersects = raycaster.intersectObjects(intersectObjects);
       if (intersects.length) {
-        console.log(intersects[0].object.name);
+        // console.log(intersects[0].object.name);
         // setSelect(intersects[0].object.name);
         sel.current = intersects[0].object.name;
         if (intersects[0].object.log) {
@@ -541,10 +626,10 @@ export default function Home() {
       objs.current = ray.intersectObjects(scene.children);
 
       let objsResult = objs.current.map((obj) => {
-        console.log(obj.object);
-        if (obj.object.name === "redbook") {
-          console.log(objsResult);
-        }
+        // console.log(obj.object);
+        // if (obj.object.name === "redbook") {
+        //   console.log(objsResult);
+        // }
       });
     }
   }, []);
