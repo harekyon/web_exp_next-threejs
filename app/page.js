@@ -9,7 +9,7 @@ import * as Stats from "stats-js";
 import GUI from "lil-gui";
 
 // three lib
-import * as THREE from "three";
+import * as THREE from "/node_modules/three/build/three.module.js";
 import { orbitControler } from "../Modules/orbitControler.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
@@ -511,7 +511,8 @@ export default function Home() {
       );
       raycaster.setFromCamera(vector, camera);
 
-      const intersects = raycaster.intersectObjects(intersectObjects);
+      console.log(intersects);
+      const intersects = raycaster?.intersectObjects(intersectObjects);
       if (intersects.length) {
         console.log(intersects[0].object.name);
         // setSelect(intersects[0].object.name);
@@ -525,7 +526,7 @@ export default function Home() {
       console.log("run");
     }
 
-    window.addEventListener("mousemove", returnHoverObj);
+    // window.addEventListener("mousemove", returnHoverObj);
     function returnHoverObj(e) {
       // console.log(book1.name);
       let mouseX =
