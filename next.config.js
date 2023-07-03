@@ -1,6 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  export: "next build && next export",
+  output: "export",
 };
 
 module.exports = nextConfig;
+
+// module.exports = {
+//   output: "export",
+//   assetPrefix: "/threePractice",
+//   async rewrites() {
+//     return [
+//       {
+//         source: "/threePractice",
+//         destination: "/",
+//       },
+//     ];
+//   },
+// };
