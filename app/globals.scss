@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+.simple-annotation--wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  margin-left: 15px;
+  margin-top: 15px;
+  padding: 1em;
+  width: 200px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 0.5em;
+  font-size: 12px;
+  line-height: 1.2;
+  opacity: 0.2;
+  transition: opacity 0.5s;
+  &:hover {
+    opacity: 1;
+  }
+}
+.simple-annotation__title {
+  font-weight: 900;
+  font-size: 14px;
+  padding-bottom: 6px;
+}
+.simple-annotation__abs {
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.annotation2 {
+  background: red;
+}
+#number {
+  position: absolute;
+  z-index: -1;
+}

@@ -1,18 +1,11 @@
 import * as THREE from "three";
 import * as Tools from "../Modules/tools";
 
-console.log(Tools);
-let aaa = "nyo~n";
-function ffff() {
-  console.log("nyoooooooooon");
-}
 let planeGeometry = new THREE.PlaneGeometry(42, 42, 1, 1);
 let textureLoader = new THREE.TextureLoader();
 let floorTex = {
   texDiff: textureLoader.load(
-    "/laminate_floor_03_2k/textures/laminate_floor_03_diff_2k.jpg",
-    THREE.RepeatWrappin,
-    THREE.RepeatWrappin
+    "/laminate_floor_03_2k/textures/laminate_floor_03_diff_2k.jpg"
   ),
   texAo: textureLoader.load(
     "/laminate_floor_03_2k/textures/laminate_floor_03_ao_2k.jpg"
@@ -20,9 +13,6 @@ let floorTex = {
   texNormal: textureLoader.load(
     "/laminate_floor_03_2k/textures/laminate_floor_03_nor_dx_2k.jpg"
   ),
-  // texDisp: textureLoader.load(
-  //   "/laminate_floor_03_2k/textures/laminate_floor_03_disp_2k.jpg"
-  // ),
   texRough: textureLoader.load(
     "/laminate_floor_03_2k/textures/laminate_floor_03_rough_2k.jpg"
   ),
