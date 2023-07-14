@@ -329,7 +329,7 @@ export default function Home() {
 
     let hdrObj = new RGBELoader().load(
       // `${mode === "PRODUCT" ? "/threePractice/hdr.hdr" : "/hdr.hdr"}`,
-      "/threePractice/hdr.hdr",
+      "/hdr.hdr",
       function (texture) {
         let hdrImg = new THREE.MeshStandardMaterial({ map: texture });
         hdrImg.envMapIntensity = 0.1;
@@ -338,7 +338,7 @@ export default function Home() {
         hdrImg.map.mapping = THREE.EquirectangularReflectionMapping;
         let aaaa = texture;
         aaaa.repeat.set(0.5, 0.5);
-        // scene.environment = aaaa; // 解像度の低いテクスチャを使用
+        scene.environment = aaaa; // 解像度の低いテクスチャを使用
       }
     );
     console.log(hdrObj);
